@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user')
 
+//Get all
 router.get('/', async (req, res, next) =>{
     try{
     const users = await User.find()
@@ -23,6 +24,25 @@ router.get('/', async (req, res, next) =>{
         });
     }
     
+});
+
+// GET One user
+router.get('/:userId', async (req, res, next) => {
+    const userId = req.params.userId;
+
+    try {
+        const user = await User.findById(userId).exec();
+
+        if (!user) {
+            return res.status(404).json({ error: `User with ID ${userId} not found` });
+        }
+
+        res.status(200).json(user);
+    } catch (err) {
+        res.status(500).json({
+            error: err.message
+        });
+    }
 });
 
 router.post('/login', (req, res, next) =>{
@@ -55,7 +75,8 @@ router.post('/login', (req, res, next) =>{
 
                 return res.status(200).json({
                     message: 'Auth successful',
-                    token:token
+                    token:token,
+                    userId: user[0]._id
                 });
             }
 

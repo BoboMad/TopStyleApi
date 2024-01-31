@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const authMiddleware = require('../middleware/authMiddleware');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 
+//router.use(authMiddleware);
+
 router.get('/', async (req, res, next) =>{
     try{
     const orders = await Order.find()
-    .populate('products.product', 'name price')
+    .populate('products.product', 'name price productImage')
     .exec();
 
     if(!orders || !orders.length){
@@ -27,18 +30,16 @@ router.get('/', async (req, res, next) =>{
 
 router.post('/', async (req, res, next) =>{
     try{
+
+        console.log('Request Body:', req.body);
         const orderData = req.body;
-
-        if (!Array.isArray(orderData)) {
-            return res.status(400).json({ error: 'Invalid order data. It should be an array of objects.' });
-          }
-
+        const userId = req.body.user.userId;
 
         let totalAmount = 0;
         const productsArray = [];
 
-        for(const orderItem of orderData){
-            const productId = orderItem._id;
+        for(const orderItem of orderData.products){
+            const productId = orderItem.product;
             const quantity = orderItem.quantity;
 
             if (!productId || !quantity) {
@@ -61,12 +62,14 @@ router.post('/', async (req, res, next) =>{
 
         const newOrder = new Order({
             _id: new mongoose.Types.ObjectId(),
+            user: userId,
             products: productsArray,
             totalAmount: totalAmount
         });
         const savedOrder = await newOrder.save();
+        console.log('Saved Order:', savedOrder);
 
-        res.status(201).json(savedOrder);
+        res.status(201).json({ success: true, order: savedOrder });
     }
     catch(err){
         console.error(err);
@@ -79,7 +82,29 @@ router.get('/:orderId', async (req, res, next) =>{
 
     try{
         const order = await Order.findById(orderId)
-        .populate('products.product', 'name price')
+        .populate('products.product', 'name price productImage')
+        .exec();
+
+        if (!order) {
+            return res.status(404).json({ error: `Order with ID ${orderId} not found` });
+        }
+
+        res.status(200).json(order);
+    }
+    catch(err){
+        res.status(500).json({
+            error: err.message
+        });
+    }
+});
+
+//Orders for user
+router.get('/user/:userId', async (req, res, next) =>{
+    const userId = req.params.userId;
+
+    try{
+        const order = await Order.find({user:userId})
+        .populate('products.product', 'name price productImage')
         .exec();
 
         if (!order) {

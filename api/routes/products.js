@@ -20,7 +20,7 @@ const Product = require('../models/product')
 //GET All
 router.get('/', (req, res, next) => {
     Product.find()
-    .select('name price _id productImage')
+    .select('name price _id productImage description')
     .exec()
     .then(docs => {
         const response = {
@@ -29,7 +29,8 @@ router.get('/', (req, res, next) => {
                 return{
                     name: doc.name,
                     price: doc.price,
-                    productImage: doc.productImage,
+                    productImage: 'http://localhost:3000/' +doc.productImage,
+                    description: doc.description,
                     _id: doc._id,
                     request:{
                         type: 'GET',
@@ -54,7 +55,8 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price,
-        productImage: req.file.path
+        productImage: req.file.path,
+        description: req.body.description
     });
     product
     .save()
@@ -86,7 +88,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
 router.get('/:productId', (req, res, next) => {
     const id = req.params.productId;
     Product.findById(id)
-    .select('name price _id productImage')
+    .select('name price _id productImage description')
     .exec()
     .then(doc =>{
         console.log('From database',doc);
