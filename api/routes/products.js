@@ -71,7 +71,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
                 _id: result._id,
                 request: {
                     type: 'GET',
-                    url: 'http://localhost:3000/products/' + result._id
+                    url: 'https://weak-teal-haddock-toga.cyclic.app/' + result._id
                 }
             }
         });
@@ -118,7 +118,7 @@ router.patch('/:productId', (req, res, next) => {
             message: 'Product updated',
             request: {
                 type: 'GET',
-                url: 'http://localhost:3000/products/' + id
+                url: 'https://weak-teal-haddock-toga.cyclic.app/' + id
             }
         });
     })
