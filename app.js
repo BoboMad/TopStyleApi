@@ -4,13 +4,27 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
+const PORT = process.env.PORT || 3000;
+
 // Handle incoming GET requests
 const productRoutes = require('./api/routes/products');
 const ordersRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
-mongoose.connect('mongodb+srv://Bobo:'+ process.env.MONGO_ATLAS_PW +'@cluster0.djv5jr6.mongodb.net/?retryWrites=true&w=majority'
-);
+const connectDB = async () => {
+    try{
+        const conn = await mongoose.connect('mongodb+srv://Bobo:'+ process.env.MONGO_ATLAS_PW +'@cluster0.djv5jr6.mongodb.net/?retryWrites=true&w=majority'
+        );
+        console.log(`MongoDB Connected: ${conn.connection.host}`);
+    }
+    catch (error) {
+        console.error(`Error connecting to MongoDB: ${error.message}`);
+        process.exit(1);
+    }
+}
+
+//mongoose.connect('mongodb+srv://Bobo:'+ process.env.MONGO_ATLAS_PW +'@cluster0.djv5jr6.mongodb.net/?retryWrites=true&w=majority'
+//);
 
 app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'));
@@ -48,5 +62,11 @@ app.use((error, req, res, next) => {
     });
 });
 
+
+connectDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server listening on port ${PORT}`);
+    });
+});
 
 module.exports = app;
