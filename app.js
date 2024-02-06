@@ -4,7 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 
 // Handle incoming GET requests
 const productRoutes = require('./api/routes/products');
