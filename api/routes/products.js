@@ -29,12 +29,12 @@ router.get('/', (req, res, next) => {
                 return{
                     name: doc.name,
                     price: doc.price,
-                    productImage: 'http://localhost:3000/' +doc.productImage,
+                    productImage: 'https://weak-teal-haddock-toga.cyclic.app/' +doc.productImage,
                     description: doc.description,
                     _id: doc._id,
                     request:{
                         type: 'GET',
-                        url:'http://localhost:3000/products/'+doc._id
+                        url:'https://weak-teal-haddock-toga.cyclic.app/products/'+doc._id
                     }
                 }
             })
